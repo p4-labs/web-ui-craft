@@ -1,0 +1,113 @@
+---
+# DESIGN.md — the design system as one file an agent reads before every build.
+# Format: Google design.md (YAML tokens up top, prose with the WHY below). Token references use
+# {group.name}. Values below are the AffiVN preset (Studio, 2026-09-29): replace them for another brand,
+# keep the structure. Delete these comment lines in the real file.
+name: <Tên sản phẩm> — <tính cách một cụm, vd "công cụ ấm, yên, chính xác">
+colors:
+  background: "#F2F0EB"      # ceramic — page
+  surface: "#FFFFFF"         # the sheet / cards
+  surface-subtle: "#F7F5F0"
+  surface-2: "#EDEBE4"       # disabled fills, skeleton
+  surface-3: "#E3E1D9"
+  border: "#E8E6DE"
+  border-strong: "#D6D3C9"
+  text: "#1E3932"            # 12.6:1 on white
+  text-2: "#37423D"          # 10.4:1
+  text-3: "#6E6E68"          # 4.5:1 on background — smallest allowed contrast
+  accent: "#00754A"          # primary buttons only; white text 5.8:1
+  accent-hover: "#006241"
+  accent-text: "#006241"     # green text / icons, focus ring
+  tint: "#D4E9E2"            # selected, done, just-added wash
+  house: "#1E3932"           # dark buttons, toasts
+  gold: "#CBA258"            # ONLY finished output
+  danger: "#C82014"
+  warn: "#B7800A"            # slow work ahead — never an error
+typography:
+  family: "Be Vietnam Pro"   # 400 / 500 / 600 only, self-hosted, unicode-range subsets
+  xs:  { fontSize: 12px, lineHeight: 1.5 }    # meta, counts, badges
+  sm:  { fontSize: 13px, lineHeight: 1.5 }    # chips, captions
+  md:  { fontSize: 14px, lineHeight: 1.5 }    # buttons, tabs, inputs, lists (default)
+  lg:  { fontSize: 15px, lineHeight: 1.6 }    # reading: chat, editor
+  xl:  { fontSize: 18px, lineHeight: 1.35, fontWeight: 600, letterSpacing: -0.01em }  # titles
+  2xl: { fontSize: 26px, lineHeight: 1.25, fontWeight: 600, letterSpacing: -0.015em } # one headline
+rounded:
+  xs: 6px
+  sm: 8px
+  md: 12px     # inputs, rows, toasts
+  lg: 16px     # cards, the sheet, video frames
+  xl: 20px     # dialogs, the composer
+  full: 999px  # buttons, chips, tabs
+spacing: [2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48, 64]
+elevation:
+  card: "0 0 .5px rgba(30,57,50,.14), 0 1px 1px rgba(30,57,50,.18)"
+  lift: "0 0 2px rgba(30,57,50,.10), 0 4px 8px rgba(30,57,50,.10), 0 12px 20px rgba(30,57,50,.08)"
+  overlay: "0 12px 32px rgba(30,57,50,.18), 0 32px 80px rgba(30,57,50,.16)"
+motion:
+  ease: "cubic-bezier(.2,.8,.2,1)"
+  fast: 120ms
+  base: 180ms
+  slow: 260ms
+components:
+  button-primary: { backgroundColor: "{colors.accent}", textColor: "#FFFFFF", rounded: "{rounded.full}", height: 36px, padding: "0 16px" }
+  button-default: { backgroundColor: "{colors.surface}", textColor: "{colors.text}", border: "1px {colors.border-strong}", rounded: "{rounded.full}", height: 36px }
+  button-disabled: { backgroundColor: "{colors.surface-2}", textColor: "{colors.text-3}" }
+  input: { backgroundColor: "{colors.surface}", border: "1px {colors.surface-3}", rounded: "{rounded.md}", height: 40px, focus: "border {colors.accent-text} + 3px ring rgba(0,98,65,.16)" }
+  card: { backgroundColor: "{colors.surface}", rounded: "{rounded.lg}", shadow: "{elevation.card}" }
+  dialog: { backgroundColor: "{colors.surface}", rounded: "{rounded.xl}", shadow: "{elevation.overlay}", padding: 24px }
+  toast: { backgroundColor: "{colors.house}", textColor: "#F2F0EB", rounded: "{rounded.md}", shadow: "{elevation.overlay}" }
+---
+
+# <Tên sản phẩm> — hệ thiết kế
+
+## Overview
+<2–4 câu: sản phẩm là gì, cho ai, họ dùng nó lúc nào, cảm giác phải có. Một tính từ chủ đạo.>
+Ví dụ: Studio là công cụ nội bộ để một người vận hành biến một chủ đề thành video. Người dùng ngồi
+hàng giờ với nó, nên giao diện phải yên, ấm, ít màu, và luôn chỉ rõ bước tiếp theo. Thương hiệu AffiVN.
+
+## Colors
+- Nền ceramic ấm + tờ giấy trắng cho vùng làm việc; chữ xanh thường xanh ba bậc.
+- **Một màu nhấn xanh** cho nút chính, focus, trạng thái chọn — ≲5% diện tích.
+- Vàng chỉ nghĩa "đã có thành phẩm". Hổ phách = "sẽ lâu", không phải lỗi. Đỏ = lỗi/xoá.
+- Cấm: tím, gradient trên UI, glow, màu thô ngoài file token.
+- Dark mode: cùng vai trò; bề mặt xanh rêu tối sáng dần theo độ nổi; xanh nâng sáng để đọc được.
+
+## Typography
+- Một họ chữ (Be Vietnam Pro, dấu tiếng Việt chuẩn), ba độ đậm, sáu cỡ. Vì sao: trước đây 18 cỡ + 5 độ
+  đậm làm mọi màn hình rối.
+- Đoạn đọc 15/1.6, cột tối đa ~640px. Tiêu đề `text-wrap: balance`, đoạn `pretty`. Số: tabular-nums.
+
+## Layout
+- Khung: cột dự án 264px trên nền + một tờ giấy trắng (bo 16, hairline, bóng thẻ) chứa header + tab.
+- Breakpoint 760px (cột → ngăn kéo); từng tab dùng container query.
+- Spacing nền 4px; khoảng trong nhóm < giữa nhóm.
+
+## Elevation & Depth
+- Phẳng trước: hairline + bề mặt. Bóng chỉ cho thứ nổi: thẻ (card), composer/menu (lift), dialog/toast
+  (overlay). Bóng nhuộm xanh house, nhiều lớp alpha thấp.
+
+## Shapes
+- Pill: nút, chip, tab. 12: input, hàng. 16: thẻ, khung video. 20: dialog, composer. Bo đồng tâm.
+
+## Components
+- Nút: một primary mỗi vùng; disabled là nền đục, không phải xanh mờ; nút bận có spinner + "Đang…".
+- Hàng "Bước tiếp theo" dưới chat khi agent mời bấm một nút ở tab khác.
+- Toast: slab xanh house góc phải dưới, chỉ khi không có chỗ phản hồi tại chỗ.
+- Trạng thái rỗng = lời mời hành động + một nút.
+
+## Motion
+- 120/180/260ms, ease-out mạnh, chỉ transform/opacity; không bounce; không animate thao tác lặp hay
+  bàn phím; reduced-motion tắt mọi chuyển động trang trí (spinner giữ).
+
+## Do's and Don'ts
+| Do | Don't | Vì sao |
+|---|---|---|
+| Dùng token vai trò | Viết hex trong file thành phần | Đổi thương hiệu/dark mode ở một chỗ |
+| Một màu nhấn | Tô xanh header, sidebar, icon, link cùng lúc | Không còn gì nổi |
+| Hairline + bề mặt | Thẻ trong thẻ, bóng mọi nơi | Rối, "dashboard AI" |
+| Nút bước tiếp ngay chỗ đang nhìn | Bắt người dùng đổi tab tìm nút | Đẹp ≠ dùng được |
+| Nhãn tiếng Việt ngắn cho bước agent | Đổ lệnh PowerShell thô vào chat | Người dùng không đọc được |
+| <thêm theo sản phẩm> | | |
+
+## Decisions log
+- <ngày> — <quyết định> — <lý do / ai duyệt>
