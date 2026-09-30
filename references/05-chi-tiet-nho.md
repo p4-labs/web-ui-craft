@@ -65,7 +65,9 @@ quang học.
 - `cursor: pointer` chỉ cho thứ bấm được; `cursor: not-allowed` cho disabled; không `pointer` trên thẻ
   không bấm được.
 - `-webkit-tap-highlight-color: transparent` + trạng thái `:active` riêng (ô xám mặc định của mobile
-  trông rẻ).
+  trông rẻ). **iOS Safari chỉ áp `:active` khi trang có ít nhất một listener `touchstart`** — nếu bỏ vệt
+  chớp mà không có listener, chạm vào nút không còn phản hồi gì:
+  `document.addEventListener('touchstart', () => {}, { passive: true });`
 - `touch-action: manipulation` trên nút → bỏ trễ double-tap-zoom.
 - `user-select: none` cho nhãn nút/tab (tránh bôi đen khi bấm nhanh); **không** cho nội dung người dùng
   muốn chép.
@@ -73,7 +75,10 @@ quang học.
   transition, không dựng bằng border (nhảy layout). Trong input có viền: `outline-offset: 0` hoặc vòng
   `box-shadow`.
 - `accent-color: var(--accent)` cho checkbox/radio/range gốc — một dòng là hết màu xanh dương mặc định.
-- `caret-color: var(--accent)` cho ô soạn.
+- `caret-color` màu thương hiệu cho mọi ô nhập (`input, textarea, [contenteditable]`) — dùng **màu chữ
+  xanh** (`--accent-text`), không dùng màu nền nút: ở AffiVN `--accent` chỉ đạt 3.4:1 trên nền tối.
+- Vùng cuộn không chứa phần tử focus được (khối log, danh sách bước) **tự nhận focus** trong Chrome
+  130+; nếu cha có `overflow: clip/hidden` thì vòng focus bị cắt → `:focus-visible { outline-offset: -2px }`.
 - Nút icon-only: `aria-label` + `title` (tooltip) cùng nội dung.
 - Phím tắt hiển thị bằng `<kbd>` (viền dưới dày 2px giả phím thật).
 
@@ -88,7 +93,8 @@ quang học.
 - `field-sizing: content` cho textarea/select tự co giãn theo nội dung (select "im lặng" chỉ rộng bằng
   lựa chọn hiện tại).
 - Placeholder là **ví dụ**, không phải nhãn ("VD: Vì sao Hà Nội có mùa hoa sữa?"), màu `--placeholder`
-  `opacity: 1` (Firefox mặc định làm mờ).
+  `opacity: 1` (Firefox mặc định làm mờ). Placeholder cũng là chữ: ≥ 4.5:1 — xám "cho nhạt" hay rớt
+  (Studio: `#8b8b84` = 3.4:1, dark `#6f7d76` = 4.0:1) → đặt `--placeholder: var(--text-3)`.
 - Ô số: `inputmode="numeric"`, bỏ nút tăng giảm nếu xấu (`appearance: textfield`).
 - Nút submit đổi trạng thái ngay khi bấm (pending), không đợi mạng.
 - Enter trong input một dòng submit form; Ctrl/⌘+Enter trong textarea.

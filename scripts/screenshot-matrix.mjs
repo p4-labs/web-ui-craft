@@ -92,13 +92,35 @@ async function shoot(browser, url, { width, height, scheme }, opts, file) {
     await page.evaluate(() => document.fonts?.ready);
     if (opts.eval) await page.evaluate(`(async () => { ${opts.eval} })()`);
     await page.waitForTimeout(opts.wait);
+    // A full-page shot never scrolls, so "reveal on scroll" sections stay blank: scroll through first.
+    if (opts.full) {
+      await page.evaluate(async () => {
+        const step = Math.max(200, Math.round(innerHeight * 0.7));
+        for (let y = 0; y < document.documentElement.scrollHeight; y += step) {
+          window.scrollTo(0, y);
+          await new Promise((r) => setTimeout(r, 140));
+        }
+        window.scrollTo(0, 0);
+      });
+      await page.waitForTimeout(900);
+    }
+    // Only a page that really scrolls sideways is a problem; then name the elements that stick out
+    // (skipping ones an overflow:hidden/clip ancestor already cuts off, e.g. decorative art).
     const overflow = await page.evaluate(() => {
       const W = document.documentElement.clientWidth;
-      const out = [];
-      if (document.documentElement.scrollWidth > W) out.push(`page ${document.documentElement.scrollWidth}px > ${W}px`);
+      if (document.documentElement.scrollWidth <= W) return [];
+      const out = [`page ${document.documentElement.scrollWidth}px > ${W}px`];
+      const clipped = (el) => {
+        for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+          if (/(hidden|clip)/.test(getComputedStyle(p).overflowX)) return true;
+        }
+        return false;
+      };
       for (const el of document.querySelectorAll('body *')) {
         const r = el.getBoundingClientRect();
-        if (r.width && r.right > W + 1 && getComputedStyle(el).position !== 'fixed') out.push(`${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? `.${el.className.trim().split(/\s+/)[0]}` : ''} → ${Math.round(r.right)}px`);
+        if (r.width && r.right > W + 1 && getComputedStyle(el).position !== 'fixed' && !clipped(el)) {
+          out.push(`${el.tagName.toLowerCase()}${el.className && typeof el.className === 'string' ? `.${el.className.trim().split(/\s+/)[0]}` : ''} → ${Math.round(r.right)}px`);
+        }
         if (out.length >= 6) break;
       }
       return out;

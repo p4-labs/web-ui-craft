@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Cài đặt dự án</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; }
+  .header { background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color: white; padding: 30px; text-align: center; }
+  .header h1 { margin: 0; font-size: 32px; }
+  .header p { margin: 8px 0 0; opacity: .8; }
+  .container { max-width: 900px; margin: 30px auto; }
+  .card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,.15); padding: 25px; margin-bottom: 25px; transition: all .3s; }
+  .card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,.2); }
+  .card h2 { font-size: 22px; color: #6a11cb; margin-top: 0; }
+  .card .icon { display: inline-block; width: 40px; height: 40px; border-radius: 12px; background: #ede7f6; text-align: center; line-height: 40px; margin-right: 10px; }
+  label { display: block; font-weight: bold; margin: 15px 0 5px; font-size: 15px; color: #333; }
+  input[type=text], select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 14px; }
+  input:focus, select:focus { outline: none; border-color: #6a11cb; }
+  .hint { font-size: 11px; color: #aaa; margin-top: 4px; }
+  .row { display: flex; gap: 20px; }
+  .row > div { flex: 1; }
+  .radio-group label { display: inline-block; font-weight: normal; margin-right: 20px; }
+  .toggle { display: flex; align-items: center; justify-content: space-between; margin: 15px 0; }
+  .btn { padding: 14px 30px; border: none; border-radius: 30px; font-size: 16px; cursor: pointer; transition: all .3s; }
+  .btn-primary { background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color: white; box-shadow: 0 5px 15px rgba(106,17,203,.4); }
+  .btn-primary:hover { transform: scale(1.05); }
+  .btn-secondary { background: #eee; color: #333; }
+  .btn-danger { background: #ff4757; color: white; }
+  .actions { text-align: center; margin: 30px 0 60px; }
+  .danger { border: 2px solid #ff4757; }
+  .danger h2 { color: #ff4757; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>⚙️ Cài Đặt Dự Án</h1>
+    <p>Tùy chỉnh mọi thứ cho video tuyệt vời của bạn ✨</p>
+  </div>
+
+  <div class="container">
+    <form id="settings-form">
+      <div class="card">
+        <h2><span class="icon">📁</span>Thông Tin Chung</h2>
+        <label for="project-name">Tên dự án</label>
+        <input type="text" id="project-name" name="project_name" value="Vì sao mèo thích chui vào hộp giấy">
+        <div class="hint">Tên hiển thị trong danh sách dự án</div>
+        <label for="topic">Chủ đề</label>
+        <input type="text" id="topic" name="topic" value="Giải thích hành vi mèo cho người mới nuôi">
+      </div>
+
+      <div class="card">
+        <h2><span class="icon">🎙️</span>Giọng Đọc</h2>
+        <div class="row">
+          <div>
+            <label for="voice">Giọng</label>
+            <select id="voice" name="voice">
+              <option value="nu-mien-bac">Nữ miền Bắc</option>
+              <option value="nam-mien-bac">Nam miền Bắc</option>
+              <option value="nu-mien-nam">Nữ miền Nam</option>
+            </select>
+          </div>
+          <div>
+            <label for="speed">Tốc độ đọc: <span id="speed-value">1.0</span>x</label>
+            <input type="range" id="speed" name="speed" min="0.8" max="1.3" step="0.05" value="1.0">
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2><span class="icon">🎨</span>Hình Ảnh</h2>
+        <label>Phong cách</label>
+        <div class="radio-group">
+          <label><input type="radio" name="style" value="ban-ve-xanh" checked> Bản vẽ xanh</label>
+          <label><input type="radio" name="style" value="thuy-mac"> Thủy mặc</label>
+          <label><input type="radio" name="style" value="bang-trang"> Bảng trắng</label>
+        </div>
+        <label for="length">Độ dài video</label>
+        <select id="length" name="length">
+          <option value="3">Khoảng 3 phút</option>
+          <option value="5" selected>Khoảng 5 phút</option>
+          <option value="10">Khoảng 10 phút</option>
+        </select>
+        <div class="toggle">
+          <span>Phụ đề</span>
+          <input type="checkbox" id="subtitles" name="subtitles" checked>
+        </div>
+        <div class="toggle">
+          <span>Nhạc nền</span>
+          <input type="checkbox" id="music" name="music">
+        </div>
+      </div>
+
+      <div class="card danger">
+        <h2><span class="icon">⚠️</span>Vùng Nguy Hiểm</h2>
+        <p>Xóa dự án sẽ xóa toàn bộ kịch bản, âm thanh và video. Không thể hoàn tác!</p>
+        <button type="button" class="btn btn-danger" id="delete-btn">🗑️ Xóa Dự Án</button>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" id="cancel-btn">Hủy</button>
+        <button type="submit" class="btn btn-primary">💾 Lưu Thay Đổi</button>
+      </div>
+    </form>
+  </div>
+
+<script>
+  const form = document.getElementById('settings-form');
+  const speed = document.getElementById('speed');
+  speed.addEventListener('input', () => { document.getElementById('speed-value').textContent = Number(speed.value).toFixed(2); });
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    console.log('save', data);
+    alert('Đã lưu!');
+  });
+  document.getElementById('cancel-btn').addEventListener('click', () => { if (confirm('Bỏ thay đổi?')) form.reset(); });
+  document.getElementById('delete-btn').addEventListener('click', () => { if (confirm('Xóa dự án này?')) alert('Đã xóa'); });
+</script>
+</body>
+</html>

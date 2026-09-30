@@ -63,7 +63,7 @@ nơi). Việc của skill là thay mặc định đó bằng: tham chiếu thậ
    cuộn ngang, console sạch, audit CSS, contrast, test logic trên dữ liệu THẬT, review code.
 8. **Sửa theo "hàng rào"**: mỗi lượt chỉ một phần, ghi rõ "không đổi gì khác".
 
-## 15 luật vàng
+## 16 luật vàng
 
 1. **Tham chiếu thật > mô tả.** Gọi tên phong cách, đưa ảnh/URL; không có tham chiếu thì model rơi về
    mặc định. Lấy "ngữ pháp" (nhịp, tỉ lệ, cách xếp), không lấy nội dung/logo.
@@ -94,6 +94,11 @@ nơi). Việc của skill là thay mặc định đó bằng: tham chiếu thậ
     "pending" tới khi dữ liệu mới về, chụp id trước mỗi `await`.
 15. **Đẹp ≠ dùng được.** Mỗi màn hình phải trả lời: người dùng cần bấm gì tiếp theo, và nó có nằm
     đúng chỗ họ đang nhìn không.
+16. **Kiềm chế cho app, cá tính cho trang giới thiệu.** Luật 3–7 giữ app yên và nhất quán, nhưng một
+    landing chỉ "đúng hệ" thì dễ nhạt. Mỗi trang giới thiệu cần **một ý tưởng đặc trưng** rút từ vật thật
+    của sản phẩm (phiếu hoàn tiền in ra, vé, biên lai, tấm voucher có khía…) và dám làm nó thật kỹ — vẫn
+    trong token của thương hiệu. Đánh giá 30/9: bản không skill thắng về độ "có hồn" ở landing nhờ đúng
+    một ý tưởng như vậy, trong khi bản theo skill sạch nhưng giản dị.
 
 ## Checklist trước khi báo xong (bản đầy đủ: 10-kiem-tra.md)
 
@@ -122,9 +127,8 @@ nơi). Việc của skill là thay mặc định đó bằng: tham chiếu thậ
 
 Chạy bằng Node 18+, không cần cài gói (riêng screenshot cần Playwright có trong máy — ví dụ
 `--playwright D:\AI\youtube\studio\engine\lemo-opuscar`): `node ~/.claude/skills/web-ui-craft/scripts/<tên>.mjs --help`.
-Chạy thật trên Studio 30/9: audit tìm 28 lỗi (overlay `rgba()` thô, cỡ `em` trong markdown-prose) — nghĩa là
-script bắt được thứ mắt người bỏ qua; contrast xác nhận `--text-3` trên ceramic đúng 4.50:1 và
-placeholder chỉ 3.43:1.
+Chạy thật trên Studio 30/9: audit tìm 28 lỗi (overlay `rgba()` thô, cỡ `em` trong markdown-prose) và contrast
+bắt placeholder 3.43:1 — thứ mắt người bỏ qua; sửa xong còn 0 lỗi, số cỡ chữ 15 → 9.
 
 ## Khi làm việc với agent phụ
 
@@ -132,4 +136,8 @@ placeholder chỉ 3.43:1.
 - Agent phụ không dùng chung trình duyệt (xung đột) → lead làm toàn bộ QA hình ảnh.
 - Yêu cầu mỗi agent trả báo cáo: đã đổi gì, class thêm/đổi tên, cần gì ở file dùng chung, câu hỏi mở.
 - Review code bằng agent độc lập, chạy trên dữ liệu thật; agent code-reviewer có thể không ghi được
-  file — dán kết quả của nó vào report.
+  file — dán kết quả của nó vào report. Lần review Studio 30/9 bắt 1 lỗi cao + 2 vừa mà ảnh chụp không
+  lộ (chỉ báo tab lệch khi có badge, hiệu ứng phát lại khi quay lại tab, tick biến mất ở reduced-motion).
+- **Vòng kiểm tra tương xứng với việc:** đầy đủ (ma trận ảnh, audit, review độc lập) cho việc lớn hoặc
+  có logic sống (poll, job, race); trang tĩnh nhỏ thì tự soát checklist là đủ. Đánh giá 30/9: vòng đầy
+  đủ làm tốn thêm ~50% token và thời gian.

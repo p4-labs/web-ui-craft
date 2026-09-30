@@ -55,6 +55,13 @@ Lớp 3 — thành phần (tuỳ chọn)     --btn-h: 36px; --composer-radius: v
 **Disabled:** nền đục (`--surface-2`) + chữ `--text-3` + bỏ viền. Không dùng "màu nhấn mờ 50%" — nhìn
 như lỗi render và lẫn với trạng thái hover.
 
+**Lớp phủ trên media là một nhóm token riêng, KHÔNG đổi theo chế độ sáng/tối** (chúng nằm trên video/ảnh,
+không nằm trên UI): `--media-bg` (letterbox đen), `--media-scrim` / `--media-scrim-strong` (nền chip,
+nút play, màn chờ/lỗi trên poster), `--on-media` / `-2` / `-3` (chữ trắng 96/84/72%), `--media-shadow`.
+Riêng `--media-outline` (viền trong 1px cho ảnh/video) thì đổi: đen 10% ở sáng, trắng 10% ở tối. Thiếu
+nhóm này, agent phụ sẽ rải `rgba(0,0,0,.6)` khắp các file (Studio: 22/28 lỗi audit là vậy). Tương tự:
+toast có token riêng (`--toast-bg/-text/-icon-*`) để dark mode chỉ đổi ở file token.
+
 ## 3. Dark mode
 
 - Thiết kế **cả hai chế độ từ đầu** bằng cùng một bộ vai trò; chỉ đổi giá trị trong
@@ -98,6 +105,11 @@ như lỗi render và lẫn với trạng thái hover.
 Studio trước khi làm lại có **18 cỡ chữ và 5 độ đậm**; sau khi gom còn 6 cỡ + 3 độ đậm → nhìn "yên"
 hẳn mà không cần đổi gì khác. Trên thiết bị cảm ứng, input phải ≥16px (iOS zoom) — đó là ngoại lệ duy
 nhất được phép thêm cỡ.
+
+**Markdown/prose cũng lên thang**, đừng để `h1 { font-size: 1.25em }` tự sinh cỡ lẻ (15px × 1.25 = 18.75,
+× 1.12 = 16.8…). Ánh xạ đã dùng ở Studio (thân prose = `--fs-lg`): `#`/`##` → `--fs-xl`; `###`…`######` →
+cỡ thân + đậm 600 (thứ bậc bằng độ đậm); code inline → `--fs-sm`; bảng → `--fs-md`; tiêu đề tài liệu ở
+chế độ đọc → `--fs-2xl` (tiêu đề duy nhất của màn hình đó).
 
 ### Thang cỡ chữ — landing/marketing (số liệu thật, mục 14)
 - Display hero **56–96px** (trung vị 80), tracking âm −1%…−5% cỡ chữ (`letter-spacing: -.02em`),

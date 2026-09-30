@@ -152,6 +152,11 @@ Hàng "Bước tiếp theo" dưới chat (03 mục 14). Luật đã chốt sau r
 - Trạng thái: `ready → running (pending/job) → done | failed` — mỗi trạng thái một bố cục, patchSection
   theo model `{kind, at, state, since, stage, path, mtime, blocked}`.
 
+**"Vừa xong" chỉ khi thật sự vừa xong.** Hiệu ứng mừng (chấm bước tiến độ nảy + tick tự vẽ) cần biết
+trạng thái trước: giữ `prevStates` (id → state) của lần vẽ trước, `null` ngay sau khi đổi dự án (lần vẽ
+đầu không mừng gì), và một **cửa sổ lắng ~2s** sau khi mở dự án — dữ liệu phụ (cấu hình, trạng thái
+phim) về trễ có thể lật một bước sang "xong" mà người dùng chưa làm gì.
+
 ## 8. Nhãn bước agent (dịch lệnh thành tiếng người)
 
 Agent Codex/DeepSeek phát sự kiện công cụ dạng lệnh thô:
@@ -175,7 +180,9 @@ Agent Codex/DeepSeek phát sự kiện công cụ dạng lệnh thô:
 - **Đồng hồ trong vùng live phải `aria-hidden="true"`** — nếu không trình đọc màn hình đọc "một phút
   hai mươi ba giây" mỗi giây.
 - Toast: container `aria-live="polite"`; lỗi quan trọng `role="alert"`.
-- Copy/lưu thành công: thông báo qua một vùng `.sr-only` `aria-live` ("Đã chép").
+- Copy/lưu thành công: thông báo qua một vùng `.sr-only` `role="status"` ("Đã chép") — **vùng riêng**,
+  tạo sẵn lúc tải trang, không dùng chung với vùng đọc nội dung (câu trả lời của agent): ghi đè vùng
+  chung sẽ cắt ngang câu đang đọc. Xoá rỗng rồi đặt chữ ở frame sau để lần chép thứ hai vẫn được đọc.
 - Nút bận: `aria-busy="true"`; nút bị chặn: `aria-disabled="true"` + lý do trong `title`/
   `aria-describedby`.
 - Tin nhắn agent mới: không đọc cả tin dài; thông báo ngắn "Agent đã trả lời" nếu người dùng đang ở tab
@@ -204,5 +211,7 @@ Agent Codex/DeepSeek phát sự kiện công cụ dạng lệnh thô:
 - [ ] "Xong" đọc từ trạng thái job, không chỉ từ mtime
 - [ ] Đồng hồ: một interval, aria-hidden trong vùng live, tự dừng
 - [ ] inert + chuyển focus trước khi ẩn
-- [ ] Animation vào chỉ cho node mới, không cho lần render đầu
+- [ ] Animation vào chỉ cho node mới, không cho lần render đầu; class một lần được gỡ khi
+      `animationend` (tab ẩn/hiện lại không phát lại hiệu ứng)
+- [ ] Vùng live cho phản hồi UI tách khỏi vùng đọc nội dung
 - [ ] Test logic thuần (nhãn, regex, trạng thái) bằng dữ liệu thật; review độc lập tìm race condition

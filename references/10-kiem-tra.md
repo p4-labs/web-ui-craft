@@ -58,15 +58,16 @@ cần chờ job thật:
 
 Chạy trong console/`browser_evaluate`:
 ```js
-// cuộn ngang + phần tử tràn phải
+// cuộn ngang + phần tử tràn phải (bỏ qua thứ đã bị cha overflow:hidden/clip cắt — hình trang trí)
 (() => {
-  const W = document.documentElement.clientWidth, out = [];
-  if (document.documentElement.scrollWidth > W) out.push(`page scrollWidth ${document.documentElement.scrollWidth} > ${W}`);
-  for (const el of document.querySelectorAll('body *')) {
+  const W = document.documentElement.clientWidth;
+  if (document.documentElement.scrollWidth <= W) return 'không cuộn ngang';
+  const clipped = (el) => { for (let p = el.parentElement; p && p !== document.body; p = p.parentElement)
+    if (/(hidden|clip)/.test(getComputedStyle(p).overflowX)) return true; return false; };
+  return [...document.querySelectorAll('body *')].filter((el) => {
     const r = el.getBoundingClientRect();
-    if (r.width && r.right > W + 1 && getComputedStyle(el).position !== 'fixed') out.push(`${el.tagName}.${el.className}`.slice(0, 80));
-  }
-  return out.slice(0, 20);
+    return r.width && r.right > W + 1 && getComputedStyle(el).position !== 'fixed' && !clipped(el);
+  }).map((el) => `${el.tagName}.${el.className}`.slice(0, 80)).slice(0, 20);
 })()
 ```
 ```js
@@ -170,6 +171,12 @@ một thay đổi, không đổi gì khác).
 - Tab bị ẩn → `document.hidden` = true → poller dừng, đồng hồ dừng: chụp ảnh trạng thái sống ở tab đang
   hiển thị.
 - Font chưa tải xong lúc chụp → chờ `document.fonts.ready` rồi thêm ~300ms.
+- **Ảnh chụp toàn trang có mảng trống lớn** → các section "hiện khi cuộn tới" (IntersectionObserver,
+  `animation-timeline: view()`) chưa chạy vì ảnh toàn trang không cuộn. Cuộn hết trang rồi về đầu trước
+  khi chụp (`screenshot-matrix.mjs --full` đã làm sẵn). Đồng thời tự hỏi: nội dung có hiện đủ khi JS lỗi
+  hoặc bật reduced-motion không? Nội dung chính không nên phụ thuộc vào reveal.
+- **API giả lập có độ trễ ngẫu nhiên** → ảnh chụp chỉ thấy skeleton; tăng `--wait` (≈9s) hoặc cho lần gọi
+  đầu của mock trả nhanh.
 - Animation vào đang chạy lúc chụp → chờ hoặc emulate reduced-motion cho ảnh tĩnh.
 - Server dev cache file tĩnh → thêm `?v=` hoặc hard reload.
 - Nhiều agent phụ cùng dùng một trình duyệt → xung đột; chỉ lead chụp.

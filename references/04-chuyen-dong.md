@@ -141,6 +141,21 @@ dialog[open]::backdrop { opacity: 1; }
 Trình duyệt chưa hỗ trợ: dialog hiện/ẩn tức thì (không hỏng). Popover (`[popover]:popover-open`) dùng
 cùng công thức. Cách cũ (chỉ có vào): `dialog[open] { animation: dialog-in 260ms var(--ease) }`.
 
+Hai cái bẫy khi có hiệu ứng ra (gặp thật ở Studio, 30/9):
+- **Dialog đang mờ dần vẫn nuốt click** (nó và backdrop còn trong top layer thêm 140ms): thêm
+  `dialog:not([open]), dialog:not([open])::backdrop { pointer-events: none; }`.
+- **Code dọn nội dung trong sự kiện `close`** (xoá body, gỡ `src` video) làm dialog mờ dần trong
+  trạng thái trống. Tắt tiếng ngay (`media.pause()`), còn phần dọn thì chờ hiệu ứng xong:
+  ```js
+  export function afterExit(dialog, cleanup) {          // dialog-exit.js ở Studio
+    const running = dialog.getAnimations?.() ?? [];      // gọi getAnimations() sẽ cập nhật style → transition đã chạy
+    const failsafe = new Promise((r) => setTimeout(r, 400));
+    Promise.race([Promise.allSettled(running.map((a) => a.finished)), failsafe]).then(cleanup);
+  }
+  // trong 'close': const t = ++token; afterExit(dialog, () => { if (t === token && !dialog.open) body.replaceChildren(); });
+  ```
+  Media đã gỡ khỏi DOM thì luôn nhả `src` (kể cả khi dialog mở lại) để không tải ngầm 20 MB.
+
 ### 6.4 `<details>` mở mượt tới `height: auto`
 ```css
 :root { interpolate-size: allow-keywords; }
@@ -170,8 +185,14 @@ function moveIndicator(tabs, indicator) {
   indicator.style.setProperty('--x', `${active.offsetLeft}px`);
   indicator.style.setProperty('--w', active.offsetWidth);
 }
-// gọi khi chọn tab + trong ResizeObserver của .tabs (font tải xong / đổi cỡ làm lệch)
+// gọi khi chọn tab + trong một ResizeObserver quan sát CẢ hàng tab LẪN TỪNG tab:
+// chấm "đang chạy" hiện trên một tab, hay font web vừa tải xong, làm tab đó rộng ra mà hàng không đổi cỡ
+const ro = new ResizeObserver(() => moveIndicator(tabs, indicator, { animate: false }));
+ro.observe(tabs); tabs.querySelectorAll('[role="tab"]').forEach((t) => ro.observe(t));
 ```
+Chỉ animate khi bấm chuột; đổi tab bằng phím mũi tên hoặc do code (mở dự án, deep link) thì nhảy thẳng.
+Nếu chỉ báo là **nền pill** thay vì gạch chân: đặt `--x --y --w --h` và transition `width` (một phần tử
+absolute, không làm xô gì) — `scaleX` sẽ bóp méo hai đầu bo tròn. Tab đang chọn khi đó để nền trong suốt.
 Cách CSS thuần (anchor positioning, Chromium): tab chọn có `anchor-name: --tab`, chỉ báo
 `position-anchor: --tab; left: anchor(left); right: anchor(right); transition: left .18s, right .18s`.
 Lần tải đầu: đặt vị trí **không** transition (thêm transition sau frame đầu) để chỉ báo không bay từ 0.
@@ -195,10 +216,12 @@ Dùng cho: copy, lưu (đĩa → tick), play ↔ pause, gửi ↔ dừng.
      stroke-linecap="round" stroke-linejoin="round"><path pathLength="1" d="M5 12.5l4.5 4.5L19 7.5"/></svg>
 ```
 ```css
-.check-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: check-draw 340ms var(--ease) 80ms forwards; }
-@keyframes check-draw { to { stroke-dashoffset: 0; } }
+.check-draw path { stroke-dasharray: 1; animation: check-draw 340ms var(--ease) 80ms both; }
+@keyframes check-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 ```
-`pathLength="1"` để khỏi đo độ dài path.
+`pathLength="1"` để khỏi đo độ dài path. Trạng thái "ẩn" chỉ nằm trong keyframes (fill `both`): nếu
+viết `stroke-dashoffset: 1` ở rule thường, khi reduced-motion tắt animation (hoặc một sheet load sau
+thắng specificity) thì dấu tick **biến mất hẳn** — lỗi thật ở Studio.
 
 ### 6.8 "Pop" hoàn thành (hiếm)
 ```css
@@ -211,6 +234,13 @@ Chỉ cho khoảnh khắc đáng ăn mừng (video dựng xong), không cho mỗ
 UI poll 3–4s một lần: nếu mọi lần vẽ lại đều chạy animation vào → cả danh sách nhấp nháy liên tục.
 - Render theo key (07 mục 3); class `.is-new` chỉ gắn trong hàm **tạo** node, và **bỏ qua lần tải đầu**
   (lần đầu mọi thứ đều "mới").
+- Với danh sách tin nhắn có chỉ số tăng dần: giữ "mốc cao nhất đã hiện" (`seenUpTo`), chỉ tin có
+  `i > seenUpTo` mới được `.is-new`; lần render đầu của một dự án truyền `animate: false`.
+- **Gỡ class sau khi chạy xong** (`animationend` + `animationcancel`, bắt bằng event delegation ở
+  container). Lý do: CSS animation chạy lại mỗi khi tổ tiên `display:none` được hiện lại — tab panel ẩn
+  bằng `[hidden]` → quay lại tab là tin nhắn cuối, nút "Dừng", hàng "Bước tiếp theo" lại trượt vào.
+  Cùng lý do, đừng đặt animation vào sân thẳng lên class cơ bản của phần tử sống lâu (`.stop-btn {
+  animation: … }`); dùng class một lần (`.is-entering`) do JS gắn đúng lúc trạng thái đổi.
 - Stagger bằng biến: `style="--i: 3"` + `animation-delay: calc(min(var(--i), 6) * 40ms)`.
 ```css
 .row.is-new { animation: row-in 220ms var(--ease) both; animation-delay: calc(min(var(--i, 0), 6) * 40ms); }
@@ -229,7 +259,10 @@ function dismiss(toast) {
 }
 ```
 Vào: thêm node, đợi một frame (`requestAnimationFrame` hai lần hoặc đọc `offsetWidth`) rồi thêm `.show`
-— hoặc dùng `@starting-style`.
+— hoặc dùng `@starting-style`. Ra: `.leaving { transform: translateY(4px); transition-duration: 140ms }`
+(ngắn hơn đường vào). Tạm dừng đếm giờ khi rê chuột bằng `pointerenter/pointerleave` **chỉ với
+`e.pointerType === 'mouse'`** — trên điện thoại một lần chạm bắn `mouseenter` mà không có `mouseleave`,
+toast sẽ bị ghim đè lên ô soạn. `dismiss()` phải bỏ qua nếu toast đã `.leaving`.
 
 ### 6.11 Nút gửi: mũi tên "nhích"
 ```css
@@ -329,6 +362,11 @@ Chính sách: **bỏ di chuyển, giữ thông tin.**
 }
 ```
 - Spinner **giữ** (nó mang trạng thái); có thể đổi sang nhịp opacity chậm.
+- `*, *::before, *::after` **không khớp** `::details-content`, `::backdrop`, `::marker`… → khối mở/đóng
+  mượt (6.4) vẫn trượt 260ms dưới reduced-motion nếu không thêm rule riêng:
+  `details.anim::details-content { transition: none !important; }` (cần `!important` vì thứ tự load).
+- Thứ bị "ẩn chờ animation" (tick tự vẽ, phần tử vào sân) phải hiện đủ khi animation bị tắt: để trạng
+  thái ẩn trong keyframes, không ở rule thường (6.7).
 - Reveal/parallax/loop → tĩnh ở trạng thái cuối; ornament đứng yên.
 - Có thể thay chuyển động bằng crossfade opacity ngắn (vẫn cho biết "đã đổi").
 - Kiểm: DevTools → Rendering → Emulate `prefers-reduced-motion: reduce`, hoặc Playwright
@@ -370,3 +408,9 @@ Chính sách: **bỏ di chuyển, giữ thông tin.**
 | Animation chạy cả khi reduced motion | Mục 8 + kiểm bằng emulate |
 | Bounce ở mọi thứ | Spring không nảy hoặc ease-out; overshoot chỉ cho khoảnh khắc hiếm |
 | Scale từ 0 | Bắt đầu .9–.98 |
+| Quay lại tab là hiệu ứng vào chạy lại | Class một lần, gỡ khi `animationend` (6.9) |
+| Dialog mờ dần mà trống trơn | Dọn nội dung sau khi exit xong (`afterExit`, 6.3) |
+| Click ngay sau Esc bị nuốt | `pointer-events: none` cho dialog/backdrop `:not([open])` |
+| Chỉ báo tab lệch khi tab có chấm badge | ResizeObserver trên từng tab (6.5) |
+| Reduced-motion: tick biến mất / details vẫn trượt | Ẩn trong keyframes; rule riêng cho `::details-content` (mục 8) |
+| Ảnh chụp toàn trang trống giữa chừng | Nội dung "reveal khi cuộn" chưa chạy: cuộn hết trang trước khi chụp (10) |

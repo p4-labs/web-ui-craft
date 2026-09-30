@@ -48,6 +48,10 @@ dialog.anim::backdrop {
 }
 dialog.anim[open]::backdrop { opacity: 1; }
 @starting-style { dialog.anim[open]::backdrop { opacity: 0; } }
+/* While it fades out, a closed dialog and its full-screen backdrop must not swallow clicks. */
+dialog.anim:not([open]), dialog.anim:not([open])::backdrop, [popover].anim:not(:popover-open) { pointer-events: none; }
+/* JS that empties the dialog on "close" must wait for the fade (else it fades out blank):
+   Promise.race([Promise.allSettled(dialog.getAnimations().map((a) => a.finished)), timeout(400)]).then(cleanup) */
 /* menus grow from their trigger: set transform-origin to the side they open from */
 [popover].anim.menu { transform-origin: top left; }
 [popover].anim.menu:not(:popover-open) { transform: scale(.96); }
@@ -69,7 +73,10 @@ details.anim[open] > summary .chevron { transform: rotate(90deg); }
 .collapse > * { min-height: 0; overflow: hidden; }
 .collapse.is-open { grid-template-rows: 1fr; }
 
-/* ---------- 5. sliding tab indicator (JS sets --x px and --w unitless width) ---------- */
+/* ---------- 5. sliding tab indicator (JS sets --x px and --w unitless width) ----------
+   Re-place it from a ResizeObserver on the row AND on every tab: a badge dot or a web font swap
+   widens one tab without resizing the row. A full pill (not an underline) transitions width instead
+   of scaleX, which would squash its rounded ends. */
 .tab-indicator {
   position: absolute; left: 0; bottom: 0; width: 1px; height: 2px; background: var(--accent);
   transform-origin: left; transform: translateX(var(--x, 0)) scaleX(var(--w, 0));
@@ -83,15 +90,20 @@ details.anim[open] > summary .chevron { transform: rotate(90deg); }
 .swap > .to, .swap[data-on] > .from { opacity: 0; transform: scale(.5); filter: blur(2px); }
 .swap[data-on] > .to { opacity: 1; transform: none; filter: none; }
 
-/* ---------- 7. self-drawing check (<path pathLength="1" …>) ---------- */
-.check-draw path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: check-draw 340ms var(--ease) 80ms forwards; }
-@keyframes check-draw { to { stroke-dashoffset: 0; } }
+/* ---------- 7. self-drawing check (<path pathLength="1" …>) ----------
+   Hidden only inside the keyframes (fill "both"): with the animation off (reduced motion, a later
+   sheet) the check is simply visible; a base `stroke-dashoffset: 1` would leave it invisible. */
+.check-draw path { stroke-dasharray: 1; animation: check-draw 340ms var(--ease) 80ms both; }
+@keyframes check-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 
 /* ---------- 8. completion pop (rare moments only) ---------- */
 .pop-in { animation: pop 320ms var(--ease) both; }
 @keyframes pop { 0% { transform: scale(.6); opacity: 0; } 60% { transform: scale(1.08); opacity: 1; } 100% { transform: scale(1); } }
 
-/* ---------- 9. only NEW items enter; set style="--i: n" for a capped stagger ---------- */
+/* ---------- 9. only NEW items enter; set style="--i: n" for a capped stagger ----------
+   One-shot: remove .enter / .pop-in on animationend (+ animationcancel). A CSS animation restarts
+   whenever a display:none ancestor is shown again (a hidden tab panel), so a class left in place
+   replays the entrance every time the user comes back to that tab. */
 .enter { animation: enter 220ms var(--ease) both; animation-delay: calc(min(var(--i, 0), 6) * 40ms); }
 @keyframes enter { from { opacity: 0; transform: translateY(4px); } }
 .fresh { animation: fresh 5s ease forwards; }                 /* "this was just produced" */
@@ -141,8 +153,8 @@ details.anim[open] > summary .chevron { transform: rotate(90deg); }
 /* ---------- reduced motion: drop movement, keep information ---------- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .01ms !important; scroll-behavior: auto !important; }
-  .enter, .pop-in, .fresh, .sk, .dot-busy, .thinking i, .check-draw path, .indeterminate::after,
-  dialog.anim[open], dialog.anim::backdrop { animation: none !important; }
-  .check-draw path { stroke-dashoffset: 0; }
+  .enter, .pop-in, .fresh, .sk, .dot-busy, .thinking i, .check-draw path, .indeterminate::after { animation: none !important; }
+  /* `*` never matches ::details-content (nor ::backdrop): stop the expand slide explicitly */
+  details.anim::details-content { transition: none !important; }
   .press:active, .press-sm:active, .zoom-media:hover img, .zoom-media:hover video { transform: none !important; }
 }

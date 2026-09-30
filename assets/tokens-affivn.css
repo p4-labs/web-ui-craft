@@ -58,7 +58,7 @@
   --text: #1e3932;     /* 12.6:1 on white */
   --text-2: #37423d;   /* 10.4:1 */
   --text-3: #6e6e68;   /* 5.1:1 on white, 4.5:1 on ceramic */
-  --placeholder: #8b8b84;
+  --placeholder: var(--text-3); /* placeholders are text: ≥ 4.5:1 (a lighter #8b8b84 was only 3.4:1) */
 
   /* ---------- accent (green) ---------- */
   --accent: #00754a;         /* primary button fill, white text 5.8:1 */
@@ -90,6 +90,23 @@
   --scrim: rgba(30, 57, 50, .34);
   --user-bubble: var(--sand-light);
 
+  /* ---------- media overlays: they sit on video / pictures, so they do NOT change with the scheme ---------- */
+  --media-bg: #000;                             /* letterbox under a video, player stage */
+  --media-scrim: rgba(0, 0, 0, .6);             /* play button, duration chip, loading veil over a poster */
+  --media-scrim-strong: rgba(0, 0, 0, .78);     /* error veil */
+  --on-media: rgba(255, 255, 255, .96);         /* text / icons on a scrim */
+  --on-media-2: rgba(255, 255, 255, .84);
+  --on-media-3: rgba(255, 255, 255, .72);
+  --media-shadow: 0 1px 3px rgba(0, 0, 0, .25); /* small badges floating on a picture */
+  --media-outline: rgba(0, 0, 0, .1);           /* 1px inset edge (outline-offset: -1px) so a white frame keeps an edge; dark: white 10% */
+
+  /* ---------- toast: house-green slab (a raised surface in dark) ---------- */
+  --toast-bg: var(--house);
+  --toast-text: var(--ceramic);
+  --toast-icon-error: #ffb3ac;
+  --toast-icon-info: #d4e9e2;
+  --toast-icon-success: #9fe0c1;
+
   /* ---------- elevation (evergreen-tinted, stacked low-alpha layers) ---------- */
   --shadow-card: 0 0 .5px rgba(30, 57, 50, .14), 0 1px 1px rgba(30, 57, 50, .18);
   --shadow-lift: 0 0 2px rgba(30, 57, 50, .10), 0 4px 8px rgba(30, 57, 50, .10), 0 12px 20px rgba(30, 57, 50, .08);
@@ -110,6 +127,7 @@
   --dur-fast: 120ms;
   --dur: 180ms;
   --dur-slow: 260ms;
+  --dur-exit: 140ms;  /* leaving is quicker than arriving */
 
   /* ---------- layers ---------- */
   --z-sticky: 10;
@@ -134,7 +152,10 @@
     --text: #e6ede8;
     --text-2: #b9c5be;
     --text-3: #8c9a93;
-    --placeholder: #6f7d76;
+    --placeholder: var(--text-3); /* 5.9:1 on the dark surface */
+    --toast-bg: var(--surface-3);
+    --toast-text: var(--text);
+    --media-outline: rgba(255, 255, 255, .1);
     --brand: #7ed1ab;
     --tint: #1b3a2f;
     --gold: #d9b46a;
@@ -192,7 +213,8 @@ input::placeholder, textarea::placeholder { color: var(--placeholder); opacity: 
 [hidden] { display: none !important; }
 * { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
 input[type="checkbox"], input[type="radio"], input[type="range"], progress { accent-color: var(--accent); }
-textarea { caret-color: var(--accent); }
+/* the text green, not the button green: --accent is only 3.4:1 as a caret on the dark surface */
+input, textarea, [contenteditable="true"] { caret-color: var(--accent-text); }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .tabular { font-variant-numeric: tabular-nums; }
 

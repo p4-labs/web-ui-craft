@@ -99,7 +99,8 @@ export function auditCss(files, { tokenFiles = new Set(), allowedWeights = [400,
         stats.sizes.set(v, (stats.sizes.get(v) || 0) + 1);
         if (!isTokens && !isVar && !SIZE_OK.test(v)) report(d.line, 'font-size-literal', `font-size ${d.value} → use a --fs-* step`);
       }
-      if (d.prop === 'font-weight') {
+      // inside @font-face, font-weight is a descriptor (which file is which weight, maybe a range), not styling
+      if (d.prop === 'font-weight' && !/^@font-face/i.test(d.block.prelude)) {
         if (!isVar) {
           const n = WEIGHT_WORDS[v] ?? Number(v);
           if (Number.isNaN(n)) report(d.line, 'font-weight', `font-weight ${d.value} (relative weights depend on the parent)`, 'warn');

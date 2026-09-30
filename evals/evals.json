@@ -1,0 +1,26 @@
+{
+  "skill_name": "web-ui-craft",
+  "evals": [
+    {
+      "id": 1,
+      "name": "landing-affivn",
+      "prompt": "Làm cho tao landing page cho AffiVN nhé. AffiVN là nền tảng hoàn tiền (cashback) khi mua Shopee: người dùng dán link sản phẩm Shopee vào, AffiVN tạo link mua qua tiếp thị liên kết, mua qua link đó thì được tích tiền hoàn, đơn giao thành công thì tiền hoàn được duyệt và rút về ngân hàng. Trang cần: phần đầu có ô dán link sản phẩm, cách hoạt động, tỉ lệ hoàn theo ngành hàng (dữ liệu mẫu tao đưa: Thời trang tới 8%, Mỹ phẩm tới 7%, Nhà cửa tới 6%, Điện tử tới 2%), câu hỏi thường gặp, chân trang. Frontend thuần HTML/CSS/JS, chưa cần backend — ô dán link cứ giả lập kết quả. Thương hiệu AffiVN có trong repo D:\\AI\\shoppe nếu cần. Làm đẹp vào, đừng trông như AI làm.",
+      "expected_output": "Một landing page tiếng Việt (index.html + CSS/JS) theo thương hiệu AffiVN, hero có ô dán link hoạt động (giả lập), các section yêu cầu, không số liệu/testimonial bịa, responsive, có trạng thái tương tác.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "settings-redesign",
+      "prompt": "File evals/files/settings-before.html là trang cài đặt dự án video trong tool của tao. Nhìn xấu và rối quá, làm lại cho đẹp, dễ dùng hơn, thêm hiệu ứng cho mấy cái nút và chăm chút mấy chi tiết nhỏ. Giữ nguyên các trường (name) và hành vi lưu / huỷ / xoá.",
+      "expected_output": "Trang cài đặt làm lại (index.html) giữ đủ trường và hành vi, bỏ phong cách mặc định kiểu AI (gradient tím, emoji icon, thẻ nhảy khi hover), có trạng thái nút đầy đủ, hiệu ứng ngắn có reduced-motion, dark mode.",
+      "files": ["evals/files/settings-before.html"]
+    },
+    {
+      "id": 3,
+      "name": "render-jobs-dashboard",
+      "prompt": "Làm cho tao trang theo dõi job dựng video: danh sách job đang chạy, đã xong, bị lỗi; mỗi job có tên video, giai đoạn hiện tại (kiểu 'Đang tạo giọng đọc', 'Đang dựng cảnh 3/12'), thời gian đã chạy, nút Huỷ khi đang chạy, Thử lại khi lỗi, Xem video khi xong. Dữ liệu lấy từ API GET /api/jobs, poll mỗi 3 giây; tạm thời giả lập API ngay trong trang (job tự tiến triển, thỉnh thoảng lỗi, mạng trễ ngẫu nhiên). HTML/CSS/JS thuần, tiếng Việt.",
+      "expected_output": "Một trang dashboard (index.html + CSS/JS) poll API giả lập, cập nhật không nhấp nháy, đồng hồ chạy mượt, nút có trạng thái đang gửi, thông báo cho trình đọc màn hình hợp lý, responsive, dark mode.",
+      "files": []
+    }
+  ]
+}

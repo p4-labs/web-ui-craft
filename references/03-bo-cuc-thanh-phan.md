@@ -152,8 +152,9 @@ Mẫu đã dùng ở Studio — gọn, ít "hộp":
 
 - Góc phải dưới (mobile: trải ngang, cách mép 12px), slab tối (`--house`) chữ sáng, bo 12, bóng bậc 3,
   icon theo loại (thành công/lỗi/thông tin), ≤ 2 dòng.
-- Vào `translateY(8px)`→0 + opacity, 180ms; ra nhanh hơn; tự tắt 3–5s (lỗi lâu hơn hoặc giữ tới khi
-  đóng); hover thì dừng đếm.
+- Vào `translateY(8px)`→0 + opacity, 180ms; ra nhanh hơn (4px, 140ms); tự tắt 3–5s (lỗi lâu hơn hoặc
+  giữ tới khi đóng); rê **chuột** thì dừng đếm (`pointerType === 'mouse'` — chạm trên điện thoại không
+  có "rời ra", toast sẽ bị ghim đè ô soạn).
 - Chỉ toast cho sự kiện **không có chỗ hiển thị tại chỗ** (job xong khi đang ở tab khác). Có chỗ tại
   chỗ thì phản hồi tại chỗ (nút đổi thành tick).
 - Cùng một lỗi lặp (poll hỏng) chỉ toast một lần, tới khi hồi phục (`failing` flag).
@@ -190,6 +191,11 @@ Mẫu đã dùng ở Studio — gọn, ít "hộp":
 
 - **Hero vừa một màn hình:** H1 ≤2 dòng, mô tả ≤20 từ, CTA chính + tối đa một phụ, ≤4 khối chữ; một
   visual thật (ảnh sản phẩm/UI thật, ảnh sinh có chủ đích), không "chữ + blob gradient".
+- **Một ý tưởng đặc trưng, làm tới nơi.** Tìm vật thật của sản phẩm rồi dựng hero quanh nó: AffiVN hoàn
+  tiền → tờ phiếu in ra từ "máy in" khi dán link (có mã phiếu, trạng thái Chờ duyệt, răng cưa mép giấy);
+  video → khung phim; khoá học → tờ lịch học. Ý tưởng đó lặp lại nhẹ ở 1–2 chỗ khác (dòng thời gian đơn
+  hàng dùng chung trạng thái của phiếu). Đừng để nó thành đồ trang trí vô nghĩa (mã vạch/con dấu chỉ khi
+  hợp với vật thật đó), và mọi số trên nó phải ghi rõ là minh hoạ.
 - Logo "được tin dùng" nằm **dưới** hero, chỉ logo (SVG thật), không nhãn ngành.
 - Mỗi section: tiêu đề ≤8 từ + mô tả ≤25 từ + một visual hoặc một CTA. Danh sách >5 mục đổi dạng
   (tab/accordion/lưới).
